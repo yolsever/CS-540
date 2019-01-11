@@ -1,20 +1,26 @@
-include("misc.jl")
-using LinearAlgebra, MathProgBase
+# Load X and y variable
+using JLD, Statistics, Printf
+data = load("outliersData.jld")
+(X,y,Xtest,ytest) = (data["X"],data["y"],data["Xtest"],data["ytest"])
+y = reshape(y, length(y))
+# Fit a least squares model
+include("leastAbsolutes.jl")
+model = leastAbsolutes(X,y)
 
-function leastAbsolutes(X,y)
+# Evaluate training error
+yhat = model.predict(X)
+trainError = mean((yhat - y).^2)
+@printf("Squared train Error with least absolutes: %.3f\n",trainError)
 
-	# Add bias column
-	n = size(X,1)
-	Z = [ones(n,1) X]
+# Evaluate test error
+yhat = model.predict(Xtest)
+testError = mean((yhat - ytest).^2)
+@printf("Squared test Error with least absolutes: %.3f\n",testError)
 
-	# Find regression weights minimizing squared error
-	# w = (Z'*Z)\(Z'*y)
-    # linprog(c, A, sense, b, l, u, solver)
-
-
-	# Make linear prediction function
-	predict(Xtilde) = [ones(size(Xtilde,1),1) Xtilde]*w
-
-	# Return model
-	return LinearModel(predict,w)
-end
+# Plot model
+using PyPlot
+figure()
+plot(X,y,"b.")
+Xhat = minimum(X):.01:maximum(X)
+yhat = model.predict(Xhat)
+plot(Xhat,yhat,"g")
