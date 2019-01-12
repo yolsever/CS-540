@@ -17,8 +17,8 @@ model = softmaxClassifier(X,y)
 # Compute training and validation error
 using Statistics
 yhat = model.predict(X)
-show(yhat[1:30])
-show(y[1:30])
+# show(yhat[1:30])
+# show(y[1:30])
 trainError = mean(yhat .!= y)
 @show(trainError)
 yhat = model.predict(Xtest)
